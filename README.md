@@ -176,6 +176,10 @@ import {
 Comprehensive utility functions:
 
 - **Process**: Process management, environment variables
+- **Child Process**: Command execution, process spawning
+- **Cluster**: Node.js cluster management, worker pools
+- **CLI**: Command-line argument parsing, progress bars, spinners
+- **Events**: EventEmitter utilities, debouncing, throttling
 - **File System**: File operations, directory management
 - **Date**: Date formatting, manipulation, timezone
 - **String**: String manipulation, formatting, validation
@@ -183,11 +187,16 @@ Comprehensive utility functions:
 - **Object**: Object manipulation, deep operations
 - **Promise**: Promise utilities, retry, timeout
 - **HTTP**: HTTP request helpers
+- **Query String**: Query string parsing, building, validation
 - **Crypto**: Hashing, encryption utilities
 - **Validation**: Data validation functions
 - **Network**: Network utilities, port checking
 - **Stream**: Stream processing
 - **Compression**: Gzip, deflate compression
+- **Timers**: Timer utilities, debounce, throttle, rate limiting
+- **Performance Hooks**: Performance measurement, timing, metrics
+- **Worker Threads**: Worker thread management, pools, message passing
+- **TypeScript**: Type guards, assertions, type-safe helpers
 - **And many more...**
 
 ## Documentation

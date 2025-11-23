@@ -1,6 +1,6 @@
 # utility-ts - Developer Onboarding Guide
 
-**Last Updated:** 2025-11-23
+**Last Updated:** 2025-01-27
 
 ## Welcome to utility-ts! 🎉
 

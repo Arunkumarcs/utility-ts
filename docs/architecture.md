@@ -1,6 +1,6 @@
 # utility-ts Architecture
 
-**Last Updated:** 2025-11-23
+**Last Updated:** 2025-01-27
 **Version:** 1.0.0
 **Authors:** Arunkumarcs
 
@@ -114,6 +114,10 @@ utility-ts/
 **Key Modules:**
 
 - **Process Utilities**: Process management, environment variables, platform info
+- **Child Process Utilities**: Command execution, process spawning, output streaming
+- **Cluster Utilities**: Node.js cluster management, worker pools, graceful shutdown
+- **CLI Utilities**: Command-line argument parsing, progress bars, spinners, table formatting
+- **Events Utilities**: EventEmitter helpers, debouncing, throttling, filtering, mapping
 - **File System Utilities**: File operations, directory management, JSON handling
 - **Date Utilities**: Date formatting, manipulation, timezone operations
 - **String Utilities**: String manipulation, formatting, case conversion
@@ -121,6 +125,7 @@ utility-ts/
 - **Object Utilities**: Object manipulation, deep operations, path access
 - **Promise Utilities**: Promise helpers, retry, timeout, concurrency control
 - **HTTP Utilities**: HTTP request helpers, query string building
+- **Query String Utilities**: Query string parsing, building, validation, nested params
 - **Crypto Utilities**: Hashing, encryption, token generation
 - **Validation Utilities**: Data validation, schema validation
 - **Lambda Utilities**: API Gateway event helpers, response builders
@@ -129,7 +134,11 @@ utility-ts/
 - **Network Utilities**: Port checking, IP validation, URL parsing
 - **Stream Utilities**: Stream processing and transformation
 - **Compression Utilities**: Gzip, deflate compression
-- **And 20+ more utility modules**
+- **Timers Utilities**: Timer utilities, debounce, throttle, rate limiting, countdown timers
+- **Performance Hooks Utilities**: Performance measurement, timing, metrics collection
+- **Worker Threads Utilities**: Worker thread management, pools, message passing
+- **TypeScript Utilities**: Type guards, assertions, type-safe helpers, type manipulation
+- **And 30+ more utility modules**
 
 **Dependencies:**
 

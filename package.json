@@ -18,12 +18,19 @@
   "keywords": [
     "typescript",
     "utility",
-    "library"
+    "library",
+    "aws",
+    "cdk"
   ],
   "author": "Arunkumarcs",
   "license": "MIT",
+  "dependencies": {
+    "aws-cdk-lib": "^2.100.0",
+    "constructs": "^10.3.0"
+  },
   "devDependencies": {
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "@types/node": "^20.10.0"
   },
   "repository": {
     "type": "git",

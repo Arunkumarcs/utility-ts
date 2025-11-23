@@ -1,0 +1,147 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+
+# Memorize User Prompts Rule
+
+## Applies to
+
+- all files
+
+## Instruction
+
+Always keep track of the user's prompts for the current day inside a JSON file at `.memory/{gitUserName}-{YYYY}-{MM}-{DD}.json`, and maintain session context. When code or documentation is updated, the cursor/agent must review these prompts and ensure changes follow them. Never discard older prompts — append new ones under the `"User Prompts"` section.
+
+
+## Expected JSON file structure
+
+```json
+{
+  "Date": "2025-09-11",
+  "SessionId": "optional-session-id-or-null",
+  "Context": {
+    "last_updated": "2025-09-11T10:00:00+05:30",
+    "metadata": {
+      "project": "<project-name>",
+      "channel": "<channel-or-client>"
+    }
+  },
+  "User Prompts": [
+    {
+      "timestamp": "2025-09-11T10:31:00+05:30",
+      "prompt": "i need cursor rule file for below operation",
+      "source": "user"
+    },
+    {
+      "timestamp": "2025-09-11T10:54:00+05:30",
+      "prompt": "create cursor menorize user prompt rule file",
+      "source": "user"
+    }
+  ],
+  "Session Context": {
+    "variables": {},
+    "last_messages": []
+  }
+}
+```
+
+Notes:
+
+- File path is always `.memory/{gitUserName}-{YYYY}-{MM}-{DD}.json` (use zero-padded year/month/day)
+- `User Prompts` is an array; **only append**, never overwrite entries.
+
+
+
+## Why
+
+To ensure continuity across edits and preserve user intent in this project.
+
+
+## Rule: On context-window-start
+
+**Trigger:** context window / session start (e.g., when the cursor begins processing a user request or opens a new context window)
+
+**Actions (ordered):**
+
+1. Compute today's file path `.memory/{gitUserName}-{YYYY}-{MM}-{DD}.json` using current local timezone.
+2. If file exists, read and parse it. If not, create a new file with the structure above and empty `User Prompts`.
+3. Load `User Prompts` into the session's initial context as `initial_prompts`.
+4. Merge `Session Context` contents (if present) into the running context.
+5. Mark the session's `source-of-truth` for prompt history as the day's JSON file.
+
+
+## Rule: On receiving a new user prompt
+
+**Trigger:** new prompt message from user
+
+**Actions (ordered):**
+
+1. Create a `prompt_entry` object with `timestamp`, `prompt`, and `source`.
+2. Append `prompt_entry` to `.memory/{gitUserName}-{YYYY}-{MM}-{DD}.json` `User Prompts` array atomically (use file lock or append transaction to prevent race conditions).
+3. Update `Context.last_updated` with current timestamp.
+4. Update `Session Context.last_messages` (push new message, keep configurable limit e.g., 50).
+5. If the prompt changes policy-relevant or project-specific constraints, set a `context.flag` for later review.
+
+**Atomic append pseudocode:**
+
+```
+lock(filePath)
+  data = readJSON(filePath)
+  data["User Prompts"].append(prompt_entry)
+  data["Context"]["last_updated"] = now()
+  writeJSONAtomic(filePath, data)
+unlock(filePath)
+```
+
+## Rule: When updating code or documentation
+
+**Trigger:** commit, patch, PR, or explicit edit command from an engineer/agent
+
+**Actions (ordered):**
+
+1. Before making changes, load `.memory/{gitUserName}-{YYYY}-{MM}-{DD}.json` and also load last N days (configurable, default 7) of `.memory/*.json` to gather recent prompts.
+2. Build a short summary of `User Prompts` that are relevant to the repo/project (e.g., prompts that mention project name or `doc` / `code` / `feature`).
+3. Validate proposed changes against the summarized prompts — check for conflicts with user requests and constraints.
+4. If any conflict or omission is found, produce a `review-note` with references to the specific prompt entries (by timestamp and excerpt) and attach it to the PR or change request.
+5. If no conflict, proceed with the update and append a system prompt entry describing the change to today's JSON file under `User Prompts` with `source: "system"` or `source: "agent"` and a `note` explaining which prompts were considered.
+
+**Example `review-note` format:**
+
+```
+- Summary: Changed README to add section X to support user request about Y.
+- Relevant prompts reviewed:
+  - 2025-09-11T10:31: "i need cursor rule file for below operation"
+  - 2025-09-11T10:54: "create cursor menorize user prompt rule file"
+- Decision: Change follows prompts. No conflicts.
+```
+
+
+## Safety and consistency rules
+
+- **Never delete** `User Prompts` entries. Only append.
+- **Do not store** highly sensitive personal data in `User Prompts` (PII, secrets). If a user provides such content, redact it and store a redaction note with `redacted: true` and a short reason.
+- Use file-locking or transactional writes to avoid corrupt state when multiple agents write concurrently.
+- Keep a configurable retention policy for archival (e.g., move older files > 365 days to `.memory/archive/`) — but do **not** delete recent files.
+
+
+## Configurable options
+
+- `days_to_review_before_edits` (default: 7)
+- `max_session_messages` (default: 50)
+- `timezone` (default: system local; prefer project config)
+- `archive_after_days` (default: 365)
+
+
+## Audit and visibility
+
+- Each write should optionally emit an audit log event with `who` (agent id), `what` (append prompt / system note), `when` (ISO timestamp), and a short diff of change.
+- PR templates should include a short checklist: “I reviewed `.memory/` prompts for the last `N` days and confirmed this change follows them” with a link or excerpt.
+
+
+## Notes for maintainers
+
+- Use zero-padded date formatting for consistent file ordering.
+- When reading multiple files for review, rank prompt relevance by simple heuristics (keyword match against repo name, files changed, or `doc|code|api|feature` tokens).
+- Provide small utilities/scripts in the repo to query and present recent prompts for reviewers.

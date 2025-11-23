@@ -1,6 +1,6 @@
 # utility-ts - Developer Onboarding Guide
 
-**Last Updated:** 2025-01-27
+**Last Updated:** 2025-11-23
 
 ## Welcome to utility-ts! 🎉
 
@@ -136,20 +136,45 @@ refactor(utils): improve function organization
 utility-ts/
 ├── src/                    # Source code
 │   ├── index.ts           # Main entry point
-│   ├── utils.ts           # General utilities
-│   └── cdk/               # CDK utilities module
-│       ├── index.ts       # CDK module entry
+│   ├── utils/             # General utilities module
+│   │   ├── index.ts       # Utils module entry
+│   │   ├── process-utils.ts
+│   │   ├── fs-utils.ts
+│   │   ├── date-utils.ts
+│   │   ├── string-utils.ts
+│   │   ├── array-utils.ts
+│   │   ├── object-utils.ts
+│   │   ├── promise-utils.ts
+│   │   ├── lambda-utils.ts
+│   │   ├── zod-utils.ts
+│   │   ├── powertools-utils.ts
+│   │   └── ... (30+ utility modules)
+│   ├── cdk/               # CDK utilities module
+│   │   ├── index.ts       # CDK module entry
+│   │   ├── types.ts       # Type definitions
+│   │   ├── naming.ts      # Naming utilities
+│   │   ├── tags.ts        # Tagging utilities
+│   │   ├── environment.ts # Environment utilities
+│   │   ├── context.ts     # Context utilities
+│   │   ├── stack-info.ts  # Stack info utilities
+│   │   ├── outputs.ts     # Output utilities
+│   │   ├── stack.ts       # Stack utilities
+│   │   └── services/      # Service-specific utilities
+│   │       ├── lambda.ts
+│   │       ├── sns.ts
+│   │       ├── sqs.ts
+│   │       └── ... (20+ service modules)
+│   └── middy/             # Middy middleware utilities
+│       ├── index.ts       # Middy module entry
 │       ├── types.ts       # Type definitions
-│       ├── naming.ts      # Naming utilities
-│       ├── tags.ts        # Tagging utilities
-│       ├── environment.ts # Environment utilities
-│       ├── context.ts     # Context utilities
-│       ├── stack-info.ts  # Stack info utilities
-│       └── outputs.ts     # Output utilities
+│       ├── middleware.ts  # Middleware functions
+│       ├── handlers.ts    # Handler utilities
+│       └── zod-middleware.ts # Zod validation
 ├── dist/                  # Compiled output (generated)
 ├── docs/                  # Documentation
 │   ├── architecture.md    # Architecture documentation
 │   ├── onboarding.md      # This file
+│   ├── contributing.md    # Contributing guidelines
 │   └── adr/               # Architecture Decision Records
 ├── .cursor/               # Cursor IDE rules and templates
 ├── package.json           # Package configuration
@@ -159,7 +184,9 @@ utility-ts/
 
 ### Key Directories
 
-- `src/` - Main source code
+- `src/utils/` - General utility functions (30+ modules)
+- `src/cdk/` - AWS CDK utilities (core + 20+ service modules)
+- `src/middy/` - Middy middleware utilities
 - `dist/` - Compiled output (do not edit directly)
 - `docs/` - Project documentation
 - `.cursor/` - IDE configuration and templates

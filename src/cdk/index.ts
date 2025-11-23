@@ -24,3 +24,9 @@ export * from "./stack-info";
 // Output utilities
 export * from "./outputs";
 
+// Stack utilities (StandardStack class and helpers)
+export * from "./stack";
+
+// AWS Service utilities
+export * from "./services";
+

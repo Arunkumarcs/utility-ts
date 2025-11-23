@@ -15,6 +15,9 @@ importers:
         specifier: ^10.3.0
         version: 10.4.3
     devDependencies:
+      '@types/aws-lambda':
+        specifier: ^8.10.130
+        version: 8.10.159
       '@types/node':
         specifier: ^20.10.0
         version: 20.19.25
@@ -36,6 +39,9 @@ packages:
     bundledDependencies:
       - jsonschema
       - semver
+
+  '@types/aws-lambda@8.10.159':
+    resolution: {integrity: sha512-SAP22WSGNN12OQ8PlCzGzRCZ7QDCwI85dQZbmpz7+mAk+L7j+wI7qnvmdKh+o7A5LaOp6QnOZ2NJphAZQTTHQg==}
 
   '@types/node@20.19.25':
     resolution: {integrity: sha512-ZsJzA5thDQMSQO788d7IocwwQbI8B5OPzmqNvpf3NY/+MHDAS759Wo0gd2WQeXYt5AAAQjzcrTVC6SKCuYgoCQ==}
@@ -76,6 +82,8 @@ snapshots:
   '@aws-cdk/asset-node-proxy-agent-v6@2.1.0': {}
 
   '@aws-cdk/cloud-assembly-schema@48.20.0': {}
+
+  '@types/aws-lambda@8.10.159': {}
 
   '@types/node@20.19.25':
     dependencies:

@@ -1,6 +1,6 @@
 # utility-ts Architecture
 
-**Last Updated:** 2025-01-27
+**Last Updated:** 2025-11-23
 **Version:** 1.0.0
 **Authors:** Arunkumarcs
 
@@ -41,16 +41,44 @@ The library is organized into logical modules, each containing related utility f
 utility-ts/
 ├── src/
 │   ├── index.ts          # Main entry point
-│   ├── utils.ts          # General utilities
-│   └── cdk/              # AWS CDK utilities module
-│       ├── index.ts      # CDK module entry point
+│   ├── utils/            # General utilities module
+│   │   ├── index.ts      # Utils module entry point
+│   │   ├── process-utils.ts
+│   │   ├── fs-utils.ts
+│   │   ├── date-utils.ts
+│   │   ├── string-utils.ts
+│   │   ├── array-utils.ts
+│   │   ├── object-utils.ts
+│   │   ├── promise-utils.ts
+│   │   ├── http-utils.ts
+│   │   ├── crypto-utils.ts
+│   │   ├── validation-utils.ts
+│   │   ├── lambda-utils.ts
+│   │   ├── zod-utils.ts
+│   │   ├── powertools-utils.ts
+│   │   └── ... (30+ utility modules)
+│   ├── cdk/              # AWS CDK utilities module
+│   │   ├── index.ts      # CDK module entry point
+│   │   ├── types.ts      # Type definitions
+│   │   ├── naming.ts     # Naming utilities
+│   │   ├── tags.ts       # Tagging utilities
+│   │   ├── environment.ts # Environment detection
+│   │   ├── context.ts    # Stack context utilities
+│   │   ├── stack-info.ts # Stack metadata
+│   │   ├── outputs.ts    # CloudFormation outputs
+│   │   ├── stack.ts      # Stack utilities
+│   │   └── services/     # Service-specific utilities
+│   │       ├── lambda.ts
+│   │       ├── sns.ts
+│   │       ├── sqs.ts
+│   │       ├── dynamodb.ts
+│   │       └── ... (20+ service modules)
+│   └── middy/            # Middy middleware utilities
+│       ├── index.ts      # Middy module entry point
 │       ├── types.ts      # Type definitions
-│       ├── naming.ts     # Naming utilities
-│       ├── tags.ts       # Tagging utilities
-│       ├── environment.ts # Environment detection
-│       ├── context.ts    # Stack context utilities
-│       ├── stack-info.ts # Stack metadata
-│       └── outputs.ts    # CloudFormation outputs
+│       ├── middleware.ts # Middleware functions
+│       ├── handlers.ts    # Handler utilities
+│       └── zod-middleware.ts # Zod validation middleware
 └── dist/                 # Compiled output
 ```
 
@@ -75,20 +103,38 @@ utility-ts/
 
 - Internal modules only
 
-#### General Utilities (`src/utils.ts`)
+#### General Utilities Module (`src/utils/`)
 
 **Responsibilities:**
 
-- Provide general-purpose utility functions
-- Serve as a placeholder for future general utilities
+- Provide comprehensive general-purpose utility functions
+- Organize utilities by functional domain
+- Support Lambda function development
 
-**Interfaces:**
+**Key Modules:**
 
-- `exampleUtil(value: string): string` - Example utility function
+- **Process Utilities**: Process management, environment variables, platform info
+- **File System Utilities**: File operations, directory management, JSON handling
+- **Date Utilities**: Date formatting, manipulation, timezone operations
+- **String Utilities**: String manipulation, formatting, case conversion
+- **Array Utilities**: Array operations, transformations, filtering
+- **Object Utilities**: Object manipulation, deep operations, path access
+- **Promise Utilities**: Promise helpers, retry, timeout, concurrency control
+- **HTTP Utilities**: HTTP request helpers, query string building
+- **Crypto Utilities**: Hashing, encryption, token generation
+- **Validation Utilities**: Data validation, schema validation
+- **Lambda Utilities**: API Gateway event helpers, response builders
+- **Zod Utilities**: Zod schema validation and transformation
+- **Powertools Utilities**: Logger, Tracer, Metrics (Powertools-style)
+- **Network Utilities**: Port checking, IP validation, URL parsing
+- **Stream Utilities**: Stream processing and transformation
+- **Compression Utilities**: Gzip, deflate compression
+- **And 20+ more utility modules**
 
 **Dependencies:**
 
-- None (pure functions)
+- Node.js built-in modules
+- `aws-lambda` types (for Lambda utilities)
 
 #### CDK Utilities Module (`src/cdk/`)
 
@@ -97,6 +143,7 @@ utility-ts/
 - Provide AWS CDK-specific helper functions
 - Organize utilities by functional area
 - Maintain type safety for CDK constructs
+- Support all major AWS services
 
 **Interfaces:**
 
@@ -107,11 +154,36 @@ utility-ts/
 - **Context** (`context.ts`): Stack context management
 - **Stack Info** (`stack-info.ts`): Stack metadata accessors
 - **Outputs** (`outputs.ts`): CloudFormation output helpers
+- **Stack** (`stack.ts`): StandardStack class with built-in utilities
+- **Services** (`services/`): Service-specific utilities for:
+  - Lambda, SNS, SQS, DynamoDB, API Gateway, S3, IAM, EventBridge
+  - CloudWatch, VPC, Step Functions, KMS, Secrets Manager, SSM
+  - CloudFront, ACM, Route53, ECR, Cognito, ECS, RDS
 
 **Dependencies:**
 
 - `aws-cdk-lib`: AWS CDK core library
 - `constructs`: CDK constructs library
+
+#### Middy Utilities Module (`src/middy/`)
+
+**Responsibilities:**
+
+- Provide Middy middleware functions
+- Support Lambda handler development
+- Integrate Zod validation
+
+**Interfaces:**
+
+- **Types** (`types.ts`): Middy type definitions
+- **Middleware** (`middleware.ts`): Common middleware functions
+- **Handlers** (`handlers.ts`): Handler wrapper utilities
+- **Zod Middleware** (`zod-middleware.ts`): Zod schema validation middleware
+
+**Dependencies:**
+
+- `@types/aws-lambda`: AWS Lambda type definitions
+- `zod`: Schema validation (peer dependency)
 
 ### Data Flow
 
@@ -129,17 +201,39 @@ The library exposes a clean, modular API:
 
 ```typescript
 // General utilities
-import { exampleUtil } from "utility-ts";
+import { 
+  getEventBody, 
+  createSuccessResponse,
+  formatDate,
+  chunk,
+  deepClone
+} from "utility-ts";
 
 // CDK utilities - full import
 import {
   generateStackName,
   applyDefaultTags,
   getEnvironment,
+  createLambdaFunction,
+  createDynamoTable
 } from "utility-ts";
 
-// CDK utilities - module-specific import
+// Middy utilities
+import { 
+  zodMiddleware, 
+  validateBody,
+  withErrorHandling 
+} from "utility-ts";
+
+// Powertools utilities
+import { 
+  createPowertoolsLogger,
+  createPowertoolsTracer 
+} from "utility-ts";
+
+// Module-specific imports (tree-shakeable)
 import { generateStackName } from "utility-ts/cdk/naming";
+import { getEventBody } from "utility-ts/utils/lambda-utils";
 ```
 
 #### Type Definitions
@@ -160,8 +254,19 @@ All public types are exported for consumer use:
 
 ### Dependencies
 
+**Runtime Dependencies:**
 - **aws-cdk-lib:** ^2.100.0 - AWS CDK core library
 - **constructs:** ^10.3.0 - CDK constructs library
+
+**Peer Dependencies (Optional):**
+- **zod:** For Zod validation utilities (install separately if needed)
+- **@middy/core:** For Middy middleware (install separately if needed)
+
+**Dev Dependencies:**
+- **typescript:** ^5.3.3 - Type checking and compilation
+- **@types/node:** ^20.10.0 - Node.js type definitions
+- **@types/aws-lambda:** ^8.10.130 - AWS Lambda type definitions
+- **@types/jest:** ^29.5.0 - Jest type definitions
 
 ### Development Tools
 
@@ -294,18 +399,22 @@ The modular structure enables effective tree-shaking:
 
 ### Planned Improvements
 
-- Add more general utility functions
-- Expand CDK utility coverage
-- Add JSDoc examples for all functions
 - Implement comprehensive test suite
 - Add CI/CD pipeline
 - Create usage examples and guides
+- Add more AWS service utilities (OpenSearch, Glue, SFTP Transfer Family)
+- Expand Powertools utilities with full CloudWatch integration
+- Add performance benchmarks
 
-### Technical Debt
+### Recent Additions
 
-- Example utility function should be replaced or removed
-- Consider adding async utility support
-- Add validation utilities
+- ✅ Comprehensive general utilities (30+ modules)
+- ✅ Full AWS CDK service utilities (20+ services)
+- ✅ Lambda function utilities
+- ✅ Middy middleware with Zod validation
+- ✅ Powertools-style logger, tracer, and metrics
+- ✅ Zod schema validation utilities
+- ✅ All functions include JSDoc documentation with examples
 
 ### Long-term Vision
 

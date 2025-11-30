@@ -5,105 +5,105 @@ This file tracks missing utility functions identified through codebase analysis.
 ## High Priority
 
 ### File System Utilities (`src/utils/fs-utils.ts`)
-- [ ] Recursive directory copy
-- [ ] Recursive directory move
-- [ ] Glob pattern matching
-- [ ] File permissions (chmod)
-- [ ] Symlink operations (create, read, check)
-- [ ] Temporary file creation
-- [ ] Temporary directory creation
-- [ ] File watching improvements (debounced watching, recursive watching)
+- [x] Recursive directory copy
+- [x] Recursive directory move
+- [x] Glob pattern matching
+- [x] File permissions (chmod)
+- [x] Symlink operations (create, read, check)
+- [x] Temporary file creation
+- [x] Temporary directory creation
+- [x] File watching improvements (debounced watching, recursive watching)
 
 ### Date Utilities (`src/utils/date-utils.ts`)
-- [ ] Timezone conversions
-- [ ] Business day calculations
-- [ ] Recurring date patterns (cron-like)
-- [ ] Date range generation
-- [ ] Working days calculation
-- [ ] Holiday detection
-- [ ] Date formatting with locale support
+- [x] Timezone conversions
+- [x] Business day calculations
+- [x] Recurring date patterns (cron-like)
+- [x] Date range generation
+- [x] Working days calculation
+- [x] Holiday detection
+- [x] Date formatting with locale support
 
-### String Utilities (`src/utils/string-utils.ts`)
-- [ ] Template string interpolation
-- [ ] Pluralization
-- [ ] Word count
-- [ ] Sentence case conversion
-- [ ] Acronym generation
-- [ ] Word wrap
-- [ ] Text truncation with word boundaries
-- [ ] String similarity (Levenshtein distance)
+### String Utilities (`src/utils/string/`)
+- [x] Template string interpolation
+- [x] Pluralization
+- [x] Word count
+- [x] Sentence case conversion
+- [x] Acronym generation
+- [x] Word wrap
+- [x] Text truncation with word boundaries
+- [x] String similarity (Levenshtein distance)
 
-### Array Utilities (`src/utils/array-utils.ts`)
-- [ ] `findIndex` with predicate
-- [ ] `findLast` - find last matching element
-- [ ] `findLastIndex` - find last matching index
-- [ ] `compact` - remove falsy values
-- [ ] `uniqBy` - unique by key function
-- [ ] `groupByBy` - group by key function
-- [ ] `chunkBy` - chunk by condition
-- [ ] `sample` - random items
-- [ ] `weightedRandom` - weighted random selection
-- [ ] `cartesianProduct` - cartesian product of arrays
+### Array Utilities (`src/utils/array/`)
+- [x] `findIndex` with predicate
+- [x] `findLast` - find last matching element
+- [x] `findLastIndex` - find last matching index
+- [x] `compact` - remove falsy values
+- [x] `uniqBy` - unique by key function
+- [x] `groupByBy` - group by key function (implemented as `groupBy`)
+- [x] `chunkBy` - chunk by condition
+- [x] `sample` - random items (implemented as `randomItems`)
+- [x] `weightedRandom` - weighted random selection
+- [x] `cartesianProduct` - cartesian product of arrays
 
-### Object Utilities (`src/utils/object-utils.ts`)
-- [ ] `pickBy` - pick by predicate
-- [ ] `omitBy` - omit by predicate
-- [ ] `defaults` - assign defaults
-- [ ] `defaultsDeep` - deep assign defaults
-- [ ] `transform` - transform object values/keys
-- [ ] `invertBy` - invert with value transformation
-- [ ] `keyBy` - create object keyed by function
-- [ ] `partitionBy` - partition object by predicate
+### Object Utilities (`src/utils/object/`)
+- [x] `pickBy` - pick by predicate
+- [x] `omitBy` - omit by predicate
+- [x] `defaults` - assign defaults
+- [x] `defaultsDeep` - deep assign defaults (implemented as `deepMerge`)
+- [x] `transform` - transform object values/keys (implemented as `mapValues` and `mapKeys`)
+- [x] `invertBy` - invert with value transformation
+- [x] `keyBy` - create object keyed by function
+- [x] `partitionBy` - partition object by predicate
 
 ### Promise Utilities (`src/utils/promise-utils.ts`)
-- [ ] `pMap` - parallel map
-- [ ] `pFilter` - parallel filter
-- [ ] `pReduce` - parallel reduce
-- [ ] `pEach` - parallel each
-- [ ] `pTimes` - execute function N times in parallel
-- [ ] `pDelay` - delay with promise
-- [ ] `pRetry` with exponential backoff
-- [ ] `pTimeout` with cleanup
+- [x] `pMap` - parallel map
+- [x] `pFilter` - parallel filter
+- [x] `pReduce` - parallel reduce
+- [x] `pEach` - parallel each
+- [x] `pTimes` - execute function N times in parallel
+- [x] `pDelay` - delay with promise (implemented as `delay`)
+- [x] `pRetry` with exponential backoff (implemented as `retry` and `retryWithBackoff` in timers)
+- [x] `pTimeout` with cleanup (implemented as `withTimeout`)
 
 ### HTTP Utilities (`src/utils/http-utils.ts`)
-- [ ] Request retry logic
-- [ ] Request interceptors
-- [ ] Response interceptors
-- [ ] Cookie handling
-- [ ] Form data encoding
-- [ ] Multipart upload
-- [ ] Request/response logging
-- [ ] HTTP/2 support
+- [x] Request retry logic
+- [x] Request interceptors
+- [x] Response interceptors
+- [x] Cookie handling
+- [x] Form data encoding
+- [x] Multipart upload
+- [x] Request/response logging
+- [x] HTTP/2 support
 
 ### Crypto Utilities (`src/utils/crypto-utils.ts`)
-- [ ] AES encryption/decryption
-- [ ] JWT token parsing (without verification)
-- [ ] Password hashing with bcrypt-like API
-- [ ] Key derivation improvements
-- [ ] Digital signatures
-- [ ] Certificate validation
-- [ ] Cipher/decipher stream utilities
-- [ ] Secure random number generation improvements
-- [ ] Key pair generation (RSA, ECDSA)
-- [ ] Certificate generation helpers
+- [x] AES encryption/decryption
+- [x] JWT token parsing (without verification)
+- [x] Password hashing with bcrypt-like API
+- [x] Key derivation improvements
+- [x] Digital signatures
+- [x] Certificate validation
+- [x] Cipher/decipher stream utilities
+- [x] Secure random number generation improvements
+- [x] Key pair generation (RSA, ECDSA)
+- [x] Certificate generation helpers
 
 ### Validation Utilities (`src/utils/validation-utils.ts`)
-- [ ] IBAN validation
-- [ ] ISBN validation
-- [ ] MAC address validation
-- [ ] Domain validation
-- [ ] File extension validation
-- [ ] MIME type validation
-- [ ] Base64 validation
-- [ ] Hex string validation
+- [x] IBAN validation
+- [x] ISBN validation
+- [x] MAC address validation
+- [x] Domain validation
+- [x] File extension validation
+- [x] MIME type validation
+- [x] Base64 validation
+- [x] Hex string validation
 
 ### Math Utilities (`src/utils/math-utils.ts`)
-- [ ] Statistical functions (mean, median, mode, std dev, variance)
-- [ ] Financial calculations (compound interest, present value)
-- [ ] Geometric functions
-- [ ] Matrix operations
-- [ ] Linear algebra helpers
-- [ ] Number formatting (currency, percentage)
+- [x] Statistical functions (mean, median, mode, std dev, variance)
+- [x] Financial calculations (compound interest, present value)
+- [x] Geometric functions
+- [x] Matrix operations
+- [x] Linear algebra helpers
+- [x] Number formatting (currency, percentage)
 
 ## Medium Priority
 
@@ -399,6 +399,6 @@ This file tracks missing utility functions identified through codebase analysis.
 
 ---
 
-**Last Updated:** 2025-11-23
+**Last Updated:** 2025-01-27
 **Total Items:** 200+
 

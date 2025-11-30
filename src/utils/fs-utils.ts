@@ -5,6 +5,8 @@
 
 import { promises as fs } from "fs";
 import * as path from "path";
+import { tmpdir } from "os";
+import { randomBytes } from "crypto";
 
 /**
  * Reads a file as string
@@ -285,4 +287,361 @@ export function watchFile(
 ): import("fs").FSWatcher {
   const fs = require("fs");
   return fs.watch(filePath, callback);
+}
+
+/**
+ * Copies a directory recursively
+ * @param src - Source directory path
+ * @param dest - Destination directory path
+ * @param options - Copy options
+ * @example
+ * await copyDirectory('/path/to/src', '/path/to/dest')
+ */
+export async function copyDirectory(
+  src: string,
+  dest: string,
+  options: { overwrite?: boolean } = {}
+): Promise<void> {
+  const { overwrite = true } = options;
+
+  // Create destination directory
+  await createDirectory(dest, true);
+
+  // Read source directory
+  const entries = await fs.readdir(src, { withFileTypes: true });
+
+  for (const entry of entries) {
+    const srcPath = path.join(src, entry.name);
+    const destPath = path.join(dest, entry.name);
+
+    if (entry.isDirectory()) {
+      await copyDirectory(srcPath, destPath, options);
+    } else {
+      if (overwrite || !(await fileExists(destPath))) {
+        await copyFile(srcPath, destPath);
+      }
+    }
+  }
+}
+
+/**
+ * Moves a directory recursively
+ * @param src - Source directory path
+ * @param dest - Destination directory path
+ * @param options - Move options
+ * @example
+ * await moveDirectory('/path/to/src', '/path/to/dest')
+ */
+export async function moveDirectory(
+  src: string,
+  dest: string,
+  options: { overwrite?: boolean } = {}
+): Promise<void> {
+  const { overwrite = true } = options;
+
+  // Try to use rename first (fastest if on same filesystem)
+  try {
+    await fs.rename(src, dest);
+    return;
+  } catch {
+    // If rename fails (cross-filesystem), fall back to copy + delete
+  }
+
+  // Copy directory recursively
+  await copyDirectory(src, dest, options);
+
+  // Delete source directory
+  await deleteDirectory(src, true);
+}
+
+/**
+ * Matches files using glob patterns (basic implementation)
+ * @param pattern - Glob pattern (supports * and ** wildcards)
+ * @param rootDir - Root directory to search (default: current directory)
+ * @returns Array of matching file paths
+ * @example
+ * const files = await glob("*.ts", "./src")
+ */
+export async function glob(
+  pattern: string,
+  rootDir: string = process.cwd()
+): Promise<string[]> {
+  const results: string[] = [];
+
+  // Convert glob pattern to regex
+  const regexPattern = pattern
+    .replace(/\./g, "\\.")
+    .replace(/\*\*/g, "___DOUBLE_STAR___")
+    .replace(/\*/g, "[^/]*")
+    .replace(/___DOUBLE_STAR___/g, ".*");
+
+  const regex = new RegExp(`^${regexPattern}$`);
+
+  async function walk(dir: string, relativePath: string = ""): Promise<void> {
+    const entries = await fs.readdir(dir, { withFileTypes: true });
+
+    for (const entry of entries) {
+      const fullPath = path.join(dir, entry.name);
+      const relPath = path.join(relativePath, entry.name);
+
+      if (entry.isDirectory()) {
+        // Check if pattern allows directory traversal
+        if (pattern.includes("**")) {
+          await walk(fullPath, relPath);
+        }
+      } else if (entry.isFile()) {
+        // Check if file matches pattern
+        if (regex.test(relPath) || regex.test(path.join(rootDir, relPath))) {
+          results.push(fullPath);
+        }
+      }
+    }
+  }
+
+  await walk(rootDir);
+  return results;
+}
+
+/**
+ * Changes file permissions (chmod)
+ * @param filePath - Path to file or directory
+ * @param mode - Permission mode (octal number or string like '755')
+ * @example
+ * await chmod('script.sh', 0o755)
+ * await chmod('script.sh', '755')
+ */
+export async function chmod(
+  filePath: string,
+  mode: number | string
+): Promise<void> {
+  const modeNum = typeof mode === "string" ? parseInt(mode, 8) : mode;
+  await fs.chmod(filePath, modeNum);
+}
+
+/**
+ * Gets file permissions
+ * @param filePath - Path to file or directory
+ * @returns Permission mode as octal string
+ * @example
+ * const mode = await getFileMode('script.sh') // '755'
+ */
+export async function getFileMode(filePath: string): Promise<string> {
+  const stats = await getFileStats(filePath);
+  return (stats.mode & parseInt("777", 8)).toString(8);
+}
+
+/**
+ * Creates a symbolic link
+ * @param target - Target path
+ * @param linkPath - Link path
+ * @param type - Link type ('file', 'dir', or 'junction' on Windows)
+ * @example
+ * await createSymlink('/path/to/target', '/path/to/link', 'file')
+ */
+export async function createSymlink(
+  target: string,
+  linkPath: string,
+  type: "file" | "dir" | "junction" = "file"
+): Promise<void> {
+  await fs.symlink(target, linkPath, type);
+}
+
+/**
+ * Reads the target of a symbolic link
+ * @param linkPath - Path to symbolic link
+ * @returns Target path
+ * @example
+ * const target = await readSymlink('/path/to/link')
+ */
+export async function readSymlink(linkPath: string): Promise<string> {
+  return fs.readlink(linkPath);
+}
+
+/**
+ * Checks if a path is a symbolic link
+ * @param filePath - Path to check
+ * @returns True if path is a symbolic link
+ * @example
+ * const isLink = await isSymlink('/path/to/link')
+ */
+export async function isSymlink(filePath: string): Promise<boolean> {
+  try {
+    const stats = await fs.lstat(filePath);
+    return stats.isSymbolicLink();
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Creates a temporary file
+ * @param options - Options for temporary file creation
+ * @returns Path to temporary file
+ * @example
+ * const tmpFile = await createTempFile({ prefix: 'my-', suffix: '.tmp' })
+ */
+export async function createTempFile(
+  options: {
+    prefix?: string;
+    suffix?: string;
+    dir?: string;
+  } = {}
+): Promise<string> {
+  const { prefix = "tmp-", suffix = "", dir = tmpdir() } = options;
+
+  // Generate unique filename
+  const randomStr = randomBytes(6).toString("hex");
+  const fileName = `${prefix}${randomStr}${suffix}`;
+  const filePath = path.join(dir, fileName);
+
+  // Create empty file
+  await fs.writeFile(filePath, "");
+
+  return filePath;
+}
+
+/**
+ * Creates a temporary directory
+ * @param options - Options for temporary directory creation
+ * @returns Path to temporary directory
+ * @example
+ * const tmpDir = await createTempDirectory({ prefix: 'my-' })
+ */
+export async function createTempDirectory(
+  options: {
+    prefix?: string;
+    dir?: string;
+  } = {}
+): Promise<string> {
+  const { prefix = "tmp-", dir = tmpdir() } = options;
+
+  // Generate unique directory name
+  const randomStr = randomBytes(6).toString("hex");
+  const dirName = `${prefix}${randomStr}`;
+  const dirPath = path.join(dir, dirName);
+
+  // Create directory
+  await fs.mkdir(dirPath, { recursive: true });
+
+  return dirPath;
+}
+
+/**
+ * Watches a file with debouncing
+ * @param filePath - Path to file
+ * @param callback - Callback function
+ * @param delayMs - Debounce delay in milliseconds (default: 300)
+ * @returns Watcher instance with close method
+ * @example
+ * const watcher = watchFileDebounced('data.txt', () => {
+ *   console.log('File changed (debounced)')
+ * }, 500)
+ */
+export function watchFileDebounced(
+  filePath: string,
+  callback: (eventType: string, filename: string | null) => void,
+  delayMs: number = 300
+): import("fs").FSWatcher & { close: () => void } {
+  const fs = require("fs");
+  let timeoutId: NodeJS.Timeout | null = null;
+  let lastEvent: { eventType: string; filename: string | null } | null = null;
+
+  const watcher = fs.watch(
+    filePath,
+    (eventType: string, filename: string | null) => {
+      lastEvent = { eventType, filename };
+
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+
+      timeoutId = setTimeout(() => {
+        if (lastEvent) {
+          callback(lastEvent.eventType, lastEvent.filename);
+          lastEvent = null;
+        }
+      }, delayMs);
+    }
+  );
+
+  const originalClose = watcher.close.bind(watcher);
+  watcher.close = () => {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+    originalClose();
+  };
+
+  return watcher as import("fs").FSWatcher & { close: () => void };
+}
+
+/**
+ * Watches a directory recursively for changes
+ * @param dirPath - Path to directory
+ * @param callback - Callback function
+ * @param options - Watch options
+ * @returns Watcher instances map
+ * @example
+ * const watchers = await watchDirectoryRecursive('/path/to/dir', (eventType, filename) => {
+ *   console.log('File changed:', filename)
+ * })
+ */
+export async function watchDirectoryRecursive(
+  dirPath: string,
+  callback: (
+    eventType: string,
+    filename: string | null,
+    filePath: string
+  ) => void,
+  options: { recursive?: boolean; debounceMs?: number } = {}
+): Promise<Map<string, import("fs").FSWatcher>> {
+  const { recursive = true, debounceMs } = options;
+  const watchers = new Map<string, import("fs").FSWatcher>();
+  const fs = require("fs");
+
+  async function watchDir(currentDir: string): Promise<void> {
+    // Watch current directory
+    const watcher = fs.watch(
+      currentDir,
+      { recursive: false },
+      (eventType: string, filename: string | null) => {
+        if (filename) {
+          const filePath = path.join(currentDir, filename);
+          callback(eventType, filename, filePath);
+
+          // If it's a new directory and recursive is enabled, watch it too
+          if (recursive && eventType === "rename") {
+            isDirectory(filePath).then((isDir) => {
+              if (isDir && !watchers.has(filePath)) {
+                watchDir(filePath);
+              }
+            });
+          }
+        }
+      }
+    );
+
+    watchers.set(currentDir, watcher);
+
+    // Recursively watch subdirectories
+    if (recursive) {
+      try {
+        const entries = await fs.readdir(currentDir, { withFileTypes: true });
+        for (const entry of entries) {
+          if (entry.isDirectory()) {
+            const subDir = path.join(currentDir, entry.name);
+            if (!watchers.has(subDir)) {
+              await watchDir(subDir);
+            }
+          }
+        }
+      } catch {
+        // Ignore errors (e.g., permission denied)
+      }
+    }
+  }
+
+  await watchDir(dirPath);
+
+  return watchers;
 }

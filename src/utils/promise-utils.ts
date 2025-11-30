@@ -325,3 +325,144 @@ export async function any<T>(promises: Promise<T>[]): Promise<T> {
     }
   });
 }
+
+/**
+ * Maps over an array with a promise-returning function in parallel
+ * @param array - Array to map over
+ * @param fn - Promise-returning function to apply to each element
+ * @param concurrency - Optional concurrency limit (default: unlimited)
+ * @returns Promise that resolves with mapped array
+ * @example
+ * const results = await pMap([1, 2, 3], async (n) => n * 2)
+ * // results: [2, 4, 6]
+ */
+export async function pMap<T, R>(
+  array: T[],
+  fn: (item: T, index: number) => Promise<R>,
+  concurrency?: number
+): Promise<R[]> {
+  if (concurrency === undefined || concurrency <= 0) {
+    return Promise.all(array.map((item, index) => fn(item, index)));
+  }
+
+  const results: R[] = Array.from({ length: array.length });
+  const executing: Promise<void>[] = [];
+  let index = 0;
+
+  const executeNext = async (): Promise<void> => {
+    if (index >= array.length) {
+      return;
+    }
+
+    const currentIndex = index++;
+    const item = array[currentIndex];
+    const promise = fn(item, currentIndex)
+      .then((result) => {
+        results[currentIndex] = result;
+      })
+      .finally(() => {
+        executing.splice(executing.indexOf(promise), 1);
+        if (index < array.length) {
+          executing.push(executeNext());
+        }
+      });
+
+    executing.push(promise);
+
+    if (executing.length < concurrency && index < array.length) {
+      await executeNext();
+    }
+  };
+
+  // Start initial batch
+  const initialBatch = Math.min(concurrency, array.length);
+  for (let i = 0; i < initialBatch; i++) {
+    executing.push(executeNext());
+  }
+
+  await Promise.all(executing);
+  return results;
+}
+
+/**
+ * Filters an array with a promise-returning predicate in parallel
+ * @param array - Array to filter
+ * @param fn - Promise-returning predicate function
+ * @param concurrency - Optional concurrency limit (default: unlimited)
+ * @returns Promise that resolves with filtered array
+ * @example
+ * const results = await pFilter([1, 2, 3, 4], async (n) => n % 2 === 0)
+ * // results: [2, 4]
+ */
+export async function pFilter<T>(
+  array: T[],
+  fn: (item: T, index: number) => Promise<boolean>,
+  concurrency?: number
+): Promise<T[]> {
+  const results: boolean[] = await pMap(
+    array,
+    (item, index) => fn(item, index),
+    concurrency
+  );
+
+  return array.filter((_, index) => results[index]);
+}
+
+/**
+ * Reduces an array with a promise-returning reducer function
+ * @param array - Array to reduce
+ * @param fn - Promise-returning reducer function
+ * @param initialValue - Initial accumulator value
+ * @returns Promise that resolves with reduced value
+ * @example
+ * const sum = await pReduce([1, 2, 3], async (acc, n) => acc + n, 0)
+ * // sum: 6
+ */
+export async function pReduce<T, R>(
+  array: T[],
+  fn: (accumulator: R, item: T, index: number) => Promise<R>,
+  initialValue: R
+): Promise<R> {
+  let accumulator = initialValue;
+
+  for (let i = 0; i < array.length; i++) {
+    accumulator = await fn(accumulator, array[i], i);
+  }
+
+  return accumulator;
+}
+
+/**
+ * Executes a promise-returning function for each element in parallel
+ * @param array - Array to iterate over
+ * @param fn - Promise-returning function to execute
+ * @param concurrency - Optional concurrency limit (default: unlimited)
+ * @returns Promise that resolves when all executions complete
+ * @example
+ * await pEach([1, 2, 3], async (n) => console.log(n))
+ */
+export async function pEach<T>(
+  array: T[],
+  fn: (item: T, index: number) => Promise<void>,
+  concurrency?: number
+): Promise<void> {
+  await pMap(array, fn, concurrency);
+}
+
+/**
+ * Executes a promise-returning function N times in parallel
+ * @param count - Number of times to execute
+ * @param fn - Promise-returning function to execute
+ * @param concurrency - Optional concurrency limit (default: unlimited)
+ * @returns Promise that resolves with array of results
+ * @example
+ * const results = await pTimes(5, async (index) => fetchData(index))
+ */
+export async function pTimes<T>(
+  count: number,
+  fn: (index: number) => Promise<T>,
+  concurrency?: number
+): Promise<T[]> {
+  const array = Array.from({ length: count }, (_, i) => i);
+  return pMap(array, (index) => fn(index), concurrency);
+}

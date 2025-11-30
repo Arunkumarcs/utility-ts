@@ -140,10 +140,10 @@ utility-ts/
 │   │   ├── index.ts       # Utils module entry
 │   │   ├── process-utils.ts
 │   │   ├── fs-utils.ts
-│   │   ├── date-utils.ts
-│   │   ├── string-utils.ts
-│   │   ├── array-utils.ts
-│   │   ├── object-utils.ts
+│   │   ├── date/              # Date utilities (subdirectory)
+│   │   ├── string/             # String utilities (subdirectory)
+│   │   ├── array/              # Array utilities (subdirectory)
+│   │   ├── object/             # Object utilities (subdirectory)
 │   │   ├── promise-utils.ts
 │   │   ├── lambda-utils.ts
 │   │   ├── zod-utils.ts

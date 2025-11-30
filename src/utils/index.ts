@@ -45,7 +45,7 @@ export * from "./fs-utils";
 export * from "./path-utils";
 
 // Date utilities
-export * from "./date-utils";
+export * from "./date";
 
 // HTTP utilities
 export * from "./http-utils";
@@ -128,13 +128,13 @@ export {
 export * from "./math-utils";
 
 // Array utilities
-export * from "./array-utils";
+export * from "./array";
 
 // Object utilities
-export * from "./object-utils";
+export * from "./object";
 
 // String utilities
-export * from "./string-utils";
+export * from "./string";
 
 // Network utilities (exclude isValidUrl - use validation-utils version)
 export {
@@ -172,7 +172,7 @@ export {
   createCountdown,
   createRateLimiter,
   scheduleAt,
-} from "./timers-utils";
+} from "./timers";
 
 // Performance hooks utilities (exclude getMemoryUsage - use process-utils version)
 export {
@@ -251,4 +251,4 @@ export {
   unsafeCast,
   brand,
   remapKeys,
-} from "./ts-utils";
+} from "./ts";

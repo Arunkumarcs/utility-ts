@@ -108,20 +108,20 @@ This file tracks missing utility functions identified through codebase analysis.
 ## Medium Priority
 
 ### Network Utilities (`src/utils/network-utils.ts`)
-- [ ] DNS resolution
-- [ ] HTTP client with retry
-- [ ] WebSocket utilities
-- [ ] Network interface enumeration
-- [ ] Bandwidth testing
-- [ ] Network latency measurement
+- [x] DNS resolution
+- [x] HTTP client with retry (implemented in http-utils.ts)
+- [x] WebSocket utilities
+- [x] Network interface enumeration
+- [x] Bandwidth testing
+- [x] Network latency measurement
 
 ### Stream Utilities (`src/utils/stream-utils.ts`)
-- [ ] Stream merging
-- [ ] Stream splitting
-- [ ] Stream buffering
-- [ ] Stream throttling
-- [ ] Stream transformation pipeline
-- [ ] Stream error recovery
+- [x] Stream merging
+- [x] Stream splitting
+- [x] Stream buffering
+- [x] Stream throttling
+- [x] Stream transformation pipeline
+- [x] Stream error recovery
 
 ### Compression Utilities (`src/utils/compression-utils.ts`)
 - [ ] Brotli compression

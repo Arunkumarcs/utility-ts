@@ -144,6 +144,21 @@ export {
   findAvailablePort,
   isValidUrlFormat,
   parseUrl,
+  resolveDNS,
+  resolveIPv4,
+  resolveIPv6,
+  reverseDNS,
+  getNetworkInterfaces,
+  getNetworkInterfaceByName,
+  measureLatency,
+  measureLatencyStats,
+  measureDownloadBandwidth,
+  measureUploadBandwidth,
+  formatBandwidth,
+  createWebSocket,
+  sendWebSocketMessage,
+  type NetworkInterface,
+  type WebSocketOptions,
 } from "./network-utils";
 
 // Stream utilities
@@ -193,8 +208,13 @@ export {
   generateReport,
 } from "./perf-hooks-utils";
 
-// Auth utilities
-export * from "./auth-utils";
+// Auth utilities (exclude hashPassword - use crypto-utils version)
+export {
+  generateSalt,
+  verifyPassword,
+  createToken,
+  verifyToken,
+} from "./auth-utils";
 
 // Queue utilities (exclude createQueue - use process-communication-utils version)
 export { Queue, PriorityQueue, createPriorityQueue } from "./queue-utils";
@@ -202,8 +222,15 @@ export { Queue, PriorityQueue, createPriorityQueue } from "./queue-utils";
 // Database utilities
 export * from "./db-utils";
 
-// AI utilities
-export * from "./ai-utils";
+// AI utilities (exclude dotProduct, normalizeVector, vectorMagnitude - use math-utils versions)
+export {
+  cosineSimilarity,
+  euclideanDistance,
+  manhattanDistance,
+  addVectors,
+  subtractVectors,
+  scaleVector,
+} from "./ai-utils";
 
 // Browser utilities
 export * from "./browser-utils";
@@ -252,3 +279,6 @@ export {
   brand,
   remapKeys,
 } from "./ts";
+
+// React utilities
+export * from "./react";

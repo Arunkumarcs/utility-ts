@@ -1,0 +1,50 @@
+{
+  "name": "utility-ts",
+  "version": "1.0.0",
+  "description": "A TypeScript utility library",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "npm run clean && npm run build"
+  },
+  "keywords": [
+    "typescript",
+    "utility",
+    "library",
+    "aws",
+    "cdk",
+    "react",
+    "hooks"
+  ],
+  "author": "Arunkumarcs",
+  "license": "MIT",
+  "dependencies": {
+    "aws-cdk-lib": "^2.100.0",
+    "constructs": "^10.3.0"
+  },
+  "peerDependencies": {
+    "react": ">=16.8.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3",
+    "@types/node": "^20.10.0",
+    "@types/aws-lambda": "^8.10.130",
+    "@types/jest": "^29.5.0",
+    "@types/react": "^18.2.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
